@@ -4,6 +4,36 @@
 #include "framework.h"
 #include "DS2Native.h"
 #include <ShlObj.h>
+// DS2Native.cpp
+#include "DS2Native.h"
+#include <Windows.h>
+
+HWND FindWorkerW() {
+    HWND progman = FindWindow(L"Progman", nullptr);
+    SendMessageTimeout(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, nullptr);
+    
+    HWND workerw = nullptr;
+    EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+        HWND shell = FindWindowEx(hwnd, nullptr, L"SHELLDLL_DefView", nullptr);
+        if (shell) {
+            *reinterpret_cast<HWND*>(lParam) = FindWindowEx(nullptr, hwnd, L"WorkerW", nullptr);
+            return FALSE;
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&workerw));
+    
+    return workerw;
+}
+
+BOOL SetWallpaperWindow(HWND hWnd) {
+    HWND workerw = FindWorkerW();
+    if (!workerw) return FALSE;
+    
+    SetParent(hWnd, workerw);
+    SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_CHILD);
+    ShowWindow(hWnd, SW_SHOW);
+    return TRUE;
+}
 
 
 ULONGLONG WINAPI DS2_GetLastInputTickCount(void) {
