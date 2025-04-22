@@ -10,6 +10,13 @@
 #define DS2NATIVE_API __declspec(dllimport)
 #endif
 
+// DS2Native.h
+#pragma once
+
+extern "C" {
+    __declspec(dllexport) HWND FindWorkerW();
+    __declspec(dllexport) BOOL SetWallpaperWindow(HWND hWnd);
+}
 
 #ifdef __cplusplus
 extern "C" {
